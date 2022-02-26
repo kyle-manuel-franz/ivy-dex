@@ -15,6 +15,8 @@ module Offchain.OrderActions where
 
 import           Ledger
 import           Plutus.Contract
+import           Prelude
+import           Text.Printf         (printf)
 
 data PlaceOrderParams = PlaceOrderParams {
     pOwner     :: !PubKeyHash,
@@ -36,5 +38,38 @@ type OrderActionSchema =
             Endpoint "placeOrder"  PlaceOrderParams
         .\/ Endpoint "cancelOrder" CancelOrderParams
         .\/ Endpoint "takeOrder"   TakeOrderParams
+
+
+placeOrder :: AsContractError e => PlaceOrderParams -> Contract w s e ()
+placeOrder op = do
+    logInfo @String $ printf "place order endpoint"
+
+cancelOrder :: AsContractError e => CancelOrderParams -> Contract w s e ()
+cancelOrder co = do
+    logInfo @String $ printf "cancel order endpoint"
+
+takeOrder :: AsContractError e => TakeOrderParams -> Contract w s e ()
+takeOrder to = do
+    logInfo @String $ printf "take order endpoint"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
