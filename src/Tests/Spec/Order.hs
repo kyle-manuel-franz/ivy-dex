@@ -6,13 +6,13 @@
 
 module Tests.Spec.Order where
 
-import Offchain.OrderActions
-import Control.Monad.Freer.Extras as Extras
-import Plutus.Trace
-import Wallet.Emulator.Wallet
-import Test.Tasty
+import           Offchain.OrderActions
+import           Control.Monad.Freer.Extras as Extras
+import           Plutus.Trace
+import           Wallet.Emulator.Wallet
+import           Test.Tasty
 import           Plutus.Contract.Test
-import Prelude
+import           Prelude
 import           Control.Monad         (void)
 import           Ledger                (ValidationError(ScriptFailure))
 import qualified Ledger.Ada            as Ada
