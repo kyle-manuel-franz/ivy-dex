@@ -48,7 +48,6 @@ type OrderActionSchema =
         .\/ Endpoint "cancelOrder" CancelOrderParams
         .\/ Endpoint "takeOrder"   TakeOrderParams
 
-
 placeOrder :: AsContractError e => PlaceOrderParams -> Contract w s e ()
 placeOrder op = do
     logInfo @String $ printf "place order endpoint"
