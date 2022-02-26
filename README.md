@@ -1,3 +1,8 @@
+# Ivy DEX
+Official Ivy DEX github repo started from the Plutus starter project from IOHK.
+
+
+
 # Plutus Platform starter project
 ![CI](https://github.com/input-output-hk/plutus-starter/actions/workflows/test.yml/badge.svg?branch=main)
 

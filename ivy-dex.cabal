@@ -41,8 +41,8 @@ common lang
 library
     import: lang
     exposed-modules:
-      MyModule
       Plutus.Contracts.Game
+      Contracts.Order
     build-depends:
       base >= 4.9 && < 5,
       aeson,
