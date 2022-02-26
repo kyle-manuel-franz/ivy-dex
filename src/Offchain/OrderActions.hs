@@ -11,28 +11,37 @@
 {-# LANGUAGE DeriveAnyClass        #-}
 {-# LANGUAGE NumericUnderscores    #-}
 
-module Offchain.OrderActions where
+module Offchain.OrderActions (
+    PlaceOrderParams (..),
+    CancelOrderParams (..),
+    TakeOrderParams (..),
+    orderActionEndpoints
+) where
 
+import           Data.Aeson             (ToJSON, FromJSON)
+import           Data.Text              (Text)
+import           GHC.Generics           (Generic)
 import           Ledger
+import           Playground.Contract    (ToSchema)
 import           Plutus.Contract
 import           Prelude
-import           Text.Printf         (printf)
+import           Text.Printf            (printf)
 
 data PlaceOrderParams = PlaceOrderParams {
     pOwner     :: !PubKeyHash,
     pBuyValue  :: !Value,
     pSellValue :: !Value
-}
+} deriving (Generic, ToJSON, FromJSON, ToSchema)
 
 data CancelOrderParams = CancelOrderParams {
     cOwner     :: !PubKeyHash
-}
+} deriving (Generic, ToJSON, FromJSON, ToSchema)
 
 data TakeOrderParams = TakeOrderParams {
     tOwner     :: !PubKeyHash,
     tBuyValue  :: !Value,
     tSellValue :: !Value
-}
+} deriving (Generic, ToJSON, FromJSON, ToSchema)
 
 type OrderActionSchema =
             Endpoint "placeOrder"  PlaceOrderParams
@@ -52,24 +61,9 @@ takeOrder :: AsContractError e => TakeOrderParams -> Contract w s e ()
 takeOrder to = do
     logInfo @String $ printf "take order endpoint"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+orderActionEndpoints :: Contract () OrderActionSchema Text ()
+orderActionEndpoints = awaitPromise (placeOrder' `select` cancelOrder' `select` takeOrder') >> orderActionEndpoints
+    where
+        placeOrder'  = endpoint @"placeOrder" placeOrder
+        cancelOrder' = endpoint @"cancelOrder" cancelOrder
+        takeOrder'   = endpoint @"takeOrder" takeOrder

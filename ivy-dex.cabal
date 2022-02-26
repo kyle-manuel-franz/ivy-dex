@@ -53,6 +53,7 @@ library
       plutus-tx-plugin,
       plutus-tx,
       plutus-ledger,
+      text
     hs-source-dirs: src
 
 test-suite ivy-dex-test
@@ -67,7 +68,7 @@ test-suite ivy-dex-test
     plutus-tx-plugin,
     plutus-contract -any,
     plutus-ledger -any,
-    plutus-starter -any
+    ivy-dex -any
   build-depends:
     base >=4.9 && <5,
     tasty -any,
@@ -85,7 +86,7 @@ executable plutus-starter-pab
     data-default -any,
     plutus-contract -any,
     plutus-pab -any,
-    plutus-starter -any,
+    ivy-dex -any,
     aeson -any,
     freer-simple -any,
     prettyprinter -any,
