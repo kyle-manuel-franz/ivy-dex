@@ -1,5 +1,5 @@
 cabal-version:      2.4
-name:               plutus-starter
+name:               ivy-dex
 version:            0.1.0.0
 
 -- A short (one-line) description of the package.
@@ -13,8 +13,8 @@ version:            0.1.0.0
 
 license: Apache-2.0
 license-files: LICENSE
-author:             Your name
-maintainer:         Your email
+author:             Kyle Franz
+maintainer:         kmfranz@protonmail.com
 
 -- A copyright notice.
 -- copyright:
@@ -41,7 +41,6 @@ common lang
 library
     import: lang
     exposed-modules:
-      Plutus.Contracts.Game
       Contracts.Order
     build-depends:
       base >= 4.9 && < 5,
@@ -54,15 +53,15 @@ library
       plutus-tx-plugin,
       plutus-tx,
       plutus-ledger,
-    hs-source-dirs: src examples/src
+    hs-source-dirs: src
 
-test-suite plutus-example-projects-test
+test-suite ivy-dex-test
   import: lang
   type: exitcode-stdio-1.0
   main-is: Spec.hs
-  hs-source-dirs: examples/test
+  hs-source-dirs: src/tests
   other-modules:
-    Spec.Game
+    Spec.Order
   build-depends:
     plutus-tx -any,
     plutus-tx-plugin,
