@@ -83,8 +83,14 @@ mkValidator OrderParams {..} dat r ctx =
                 [s] -> s
                 _ -> traceError "expected only one signatory per transaction"
 
-        valueToSeller :: Value
-        valueToSeller = valuePaidTo info $ sellerPubKeyHash
+        sellerOutputs :: [TxOut]
+        sellerOutputs = [o | o <- txOutputs, txOutAddress o == pubKeyHashAddress sellerPubKeyHash]
+
+        sellerTotalValues :: [Value]
+        sellerTotalValues = fmap txOutValue sellerOutputs
+
+        sellerTotalValue :: Value
+        sellerTotalValue = mconcat sellerTotalValues
 
         -- TODO: implement this
         feesPaidToBook :: Bool
