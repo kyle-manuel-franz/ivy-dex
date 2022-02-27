@@ -10,11 +10,12 @@
 {-# LANGUAGE TypeApplications      #-}
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE TypeOperators         #-}
-{-# LANGUAGE EmptyDataDecls #-}
-{-# LANGUAGE RecordWildCards            #-}
+{-# LANGUAGE EmptyDataDecls        #-}
+{-# LANGUAGE RecordWildCards       #-}
 
 module Contracts.Order where
 
+import           Ledger.Ada          as Ada
 import           Ledger               hiding (singleton)
 import           Ledger.Value         as Value
 import qualified Ledger.Typed.Scripts      as Scripts
@@ -28,7 +29,6 @@ data OrderDatum = OrderDatum
         odBuyValue :: Value,
         odSellValue  :: Value
     }
-
 PlutusTx.unstableMakeIsData ''OrderDatum
 
 data OrderRedeemer = Take | Cancel
@@ -51,6 +51,9 @@ mkValidator OrderParams {..} dat r ctx =
                             traceIfFalse "Only owner can cancel order" signedByOwner
 
     where
+        minRequiredFeeToBook :: Integer
+        minRequiredFeeToBook = 1000000
+
         info :: TxInfo
         info = scriptContextTxInfo ctx
 
@@ -94,7 +97,7 @@ mkValidator OrderParams {..} dat r ctx =
 
         -- TODO: implement this
         feesPaidToBook :: Bool
-        feesPaidToBook = True
+        feesPaidToBook = Ada.fromValue (valuePaidTo info $ odBook dat) >= Ada.lovelaceOf minRequiredFeeToBook
 
         -- TODO: implement this
         ownerMustGetTokensAndFees :: Bool
