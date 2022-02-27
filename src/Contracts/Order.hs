@@ -74,6 +74,18 @@ mkValidator OrderParams {..} dat r ctx =
         txOutputs :: [TxOut]
         txOutputs = txInfoOutputs info
 
+        txSignatories :: [PubKeyHash]
+        txSignatories = txInfoSignatories info
+
+        sellerPubKeyHash :: PubKeyHash
+        sellerPubKeyHash =
+            case txSignatories of
+                [s] -> s
+                _ -> traceError "expected only one signatory per transaction"
+
+        valueToSeller :: Value
+        valueToSeller = valuePaidTo info $ sellerPubKeyHash
+
         -- TODO: implement this
         feesPaidToBook :: Bool
         feesPaidToBook = True
