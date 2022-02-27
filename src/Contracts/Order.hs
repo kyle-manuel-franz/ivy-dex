@@ -54,8 +54,19 @@ mkValidator OrderParams {..} dat r ctx =
         info :: TxInfo
         info = scriptContextTxInfo ctx
 
+        ownInput :: TxInInfo
+        ownInput = case findOwnInput ctx of
+            Just i -> i
+            Nothing -> traceError "expected input from script"
+
         signedByOwner :: Bool
         signedByOwner = txSignedBy info $ odOwner dat
+
+        ownInputOutput :: TxOut
+        ownInputOutput = txInInfoResolved ownInput
+
+        ownInputValue :: Value
+        ownInputValue = txOutValue ownInputOutput
 
         -- TODO: implement this
         feesPaidToBook :: Bool
