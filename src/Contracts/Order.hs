@@ -62,11 +62,17 @@ mkValidator OrderParams {..} dat r ctx =
         signedByOwner :: Bool
         signedByOwner = txSignedBy info $ odOwner dat
 
+        valueToOwner :: Value
+        valueToOwner = valuePaidTo info $ odOwner dat
+
         ownInputOutput :: TxOut
         ownInputOutput = txInInfoResolved ownInput
 
         ownInputValue :: Value
         ownInputValue = txOutValue ownInputOutput
+
+        txOutputs :: [TxOut]
+        txOutputs = txInfoOutputs info
 
         -- TODO: implement this
         feesPaidToBook :: Bool
