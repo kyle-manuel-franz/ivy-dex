@@ -118,3 +118,9 @@ typedValidator p = Scripts.mkTypedValidator @Order
         $$(PlutusTx.compile [|| wrap ||])
     where
         wrap = Scripts.wrapValidator @OrderDatum @OrderRedeemer
+
+validator :: OrderParams -> Validator
+validator = Scripts.validatorScript . typedValidator
+
+scrAddress :: OrderParams -> Ledger.Address
+scrAddress = scriptAddress . validator

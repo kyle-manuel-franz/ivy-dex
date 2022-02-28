@@ -74,6 +74,9 @@ cancelOrder co = do
 
 takeOrder :: AsContractError e => TakeOrderParams -> Contract w s e ()
 takeOrder to = do
+    let bookAddress = Ledger.PubKeyHash "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a"
+    let p = OrderParams { scriptVersion = "0.0.1" }
+    utxos <- utxosAt $ scrAddress p
     logInfo @String $ printf "take order endpoint"
 
 orderActionEndpoints :: Contract () OrderActionSchema Text ()
