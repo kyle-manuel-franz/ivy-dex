@@ -55,7 +55,8 @@ library
       plutus-ledger,
       text,
       tasty,
-      tasty-hunit
+      tasty-hunit,
+      plutus-ledger-api
     hs-source-dirs: src
 
 test-suite ivy-dex-test
