@@ -63,7 +63,7 @@ placeOrder op = do
             odSellValue = pSellValue op
         }
     let p = OrderParams { scriptVersion = "0.0.1" }
-        tx = Constraints.mustPayToTheScript dat $ Ada.lovelaceValueOf 1000000
+        tx = Constraints.mustPayToTheScript dat $ (odSellValue dat)
     ledgerTx <- submitTxConstraints ( typedValidator p ) tx
     void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
     logInfo @String $ printf "place order endpoint"
