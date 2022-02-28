@@ -14,7 +14,7 @@ import           Test.Tasty
 import           Plutus.Contract.Test
 import           Prelude
 import           Control.Monad         (void)
-import           Ledger                (ValidationError(ScriptFailure))
+import           Ledger
 import qualified Ledger.Ada            as Ada
 import           Plutus.Contract       (Contract, ContractError(WalletError))
 import           Wallet.API            (WalletAPIError(ValidationError))
@@ -40,5 +40,12 @@ test = runEmulatorTraceIO myTrace
 
 myTrace :: EmulatorTrace ()
 myTrace = do
+    let op = PlaceOrderParams {
+        pOwner = Ledger.PubKeyHash "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a",
+        pBuyValue = Ada.lovelaceValueOf 1000000,
+        pSellValue = Ada.lovelaceValueOf 1000000
+    }
+
     h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
+    callEndpoint @"placeOrder" h1 $ op
     void $ Trace.waitNSlots 2
