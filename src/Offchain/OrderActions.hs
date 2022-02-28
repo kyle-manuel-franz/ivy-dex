@@ -59,8 +59,8 @@ placeOrder op = do
     let dat = OrderDatum {
             odOwner = pOwner op,
             odBook = Ledger.PubKeyHash "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a",
-            odBuyValue = Ada.lovelaceValueOf 1000000,
-            odSellValue = Ada.lovelaceValueOf 1000000
+            odBuyValue = pBuyValue op,
+            odSellValue = pSellValue op
         }
     let p = OrderParams { scriptVersion = "0.0.1" }
         tx = Constraints.mustPayToTheScript dat $ Ada.lovelaceValueOf 1000000
