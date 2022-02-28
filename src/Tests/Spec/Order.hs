@@ -26,7 +26,8 @@ import qualified Test.Tasty.HUnit              as HUnit
 tests :: TestTree
 tests = testGroup "order"
     [ checkPredicate "Expose lock endpoint"
-      assertNoFailedTransactions
+      (assertNoFailedTransactions
+      .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (-1000000)))
       myTrace
     ]
 
@@ -37,10 +38,12 @@ myTrace :: EmulatorTrace ()
 myTrace = do
     let op = PlaceOrderParams {
         pOwner = walletPubKeyHash (knownWallet 1),
+        pBook  = walletPubKeyHash (knownWallet 9),
         pBuyValue = Ada.lovelaceValueOf 1000000,
         pSellValue = Ada.lovelaceValueOf 1000000
     }
 
     h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
+
     callEndpoint @"placeOrder" h1 $ op
     void $ Trace.waitNSlots 2

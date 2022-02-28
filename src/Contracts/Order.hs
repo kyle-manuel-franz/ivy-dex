@@ -49,7 +49,6 @@ mkValidator OrderParams {..} dat r ctx =
                             traceIfFalse "Signing key must get lovelace" signerMustRedeemValue
                         Cancel ->
                             traceIfFalse "Only owner can cancel order" signedByOwner
-
     where
         minRequiredFeeToBook :: Integer
         minRequiredFeeToBook = 1000000
@@ -95,7 +94,6 @@ mkValidator OrderParams {..} dat r ctx =
         sellerTotalValue :: Value
         sellerTotalValue = mconcat sellerTotalValues
 
-        -- TODO: implement this
         feesPaidToBook :: Bool
         feesPaidToBook = Ada.fromValue (valuePaidTo info $ odBook dat) >= Ada.lovelaceOf minRequiredFeeToBook
 

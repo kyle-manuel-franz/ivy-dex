@@ -9,8 +9,8 @@
 {-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE DeriveAnyClass      #-}
 {-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE DeriveAnyClass        #-}
-{-# LANGUAGE NumericUnderscores    #-}
+{-# LANGUAGE DeriveAnyClass      #-}
+{-# LANGUAGE NumericUnderscores  #-}
 
 module Offchain.OrderActions (
     PlaceOrderParams (..),
@@ -40,6 +40,7 @@ import           Contracts.Order
 
 data PlaceOrderParams = PlaceOrderParams {
     pOwner     :: !PubKeyHash,
+    pBook      :: !PubKeyHash,
     pBuyValue  :: !Value,
     pSellValue :: !Value
 } deriving (Generic, ToJSON, FromJSON, ToSchema)
@@ -72,7 +73,6 @@ placeOrder op = do
         ledgerTx <- submitTxConstraints ( typedValidator p ) tx
         void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
         logInfo @String $ printf "place order endpoint"
-
 
 cancelOrder :: AsContractError e => CancelOrderParams -> Contract w s e ()
 cancelOrder co = do
