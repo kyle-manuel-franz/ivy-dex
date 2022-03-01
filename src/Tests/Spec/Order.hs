@@ -26,6 +26,8 @@ import qualified Test.Tasty.HUnit              as HUnit
 bookWallet :: Wallet
 bookWallet = knownWallet 9
 
+-- TODO: Set the config fee structure
+
 tests :: TestTree
 tests = testGroup "order"
     [ checkPredicate "Can place an order"
@@ -34,17 +36,17 @@ tests = testGroup "order"
       .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (-1000000))
       )
       simpleOrderPlacementTrace,
-      checkPredicate "Can place an order"
+      checkPredicate "Can place and take order"
       (
            assertNoFailedTransactions
-        .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (-1000000))
+        .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (10000))
         .&&. walletFundsChange bookWallet (Ada.lovelaceValueOf (1000000))
       )
       simpleOrderPlacementAndTakeTrace
     ]
 
 test :: IO ()
-test = runEmulatorTraceIO simpleOrderPlacementTrace
+test = runEmulatorTraceIO simpleOrderPlacementAndTakeTrace
 
 simpleOrderPlacementTrace :: EmulatorTrace ()
 simpleOrderPlacementTrace = do
@@ -70,11 +72,12 @@ simpleOrderPlacementAndTakeTrace = do
     }
 
     h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
+    h2 <- activateContractWallet (knownWallet 2) orderActionEndpoints
 
     callEndpoint @"placeOrder" h1 $ op
     void $ Trace.waitNSlots 2
 
-    callEndpoint @"takeOrder" h1 $ TakeOrderParams {
+    callEndpoint @"takeOrder" h2 $ TakeOrderParams {
         tOwner = walletPubKeyHash (knownWallet 1),
         tBook  = walletPubKeyHash bookWallet,
         tBuyValue = Ada.lovelaceValueOf 1000000,
