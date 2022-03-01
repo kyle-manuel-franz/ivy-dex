@@ -48,6 +48,29 @@ tests = testGroup "order"
 test :: IO ()
 test = runEmulatorTraceIO simpleOrderPlacementAndTakeTrace
 
+cancelOrderTrace :: EmulatorTrace ()
+cancelOrderTrace = do
+    let op = PlaceOrderParams {
+        pOwner = walletPubKeyHash (knownWallet 1),
+        pBook  = walletPubKeyHash bookWallet,
+        pBuyValue = Ada.lovelaceValueOf 1000000,
+        pSellValue = Ada.lovelaceValueOf 1000000
+    }
+
+    h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
+
+    callEndpoint @"placeOrder" h1 $ op
+    void $ Trace.waitNSlots 2
+
+    let co = CancelOrderParams {
+        cOwner = walletPubKeyHash (knownWallet 1)
+    }
+
+    callEndpoint @"cancelOrder" h1 $ co
+
+    void $ Trace.waitNSlots 2
+
+
 simpleOrderPlacementTrace :: EmulatorTrace ()
 simpleOrderPlacementTrace = do
     let op = PlaceOrderParams {
@@ -61,6 +84,7 @@ simpleOrderPlacementTrace = do
 
     callEndpoint @"placeOrder" h1 $ op
     void $ Trace.waitNSlots 2
+
 
 simpleOrderPlacementAndTakeTrace :: EmulatorTrace ()
 simpleOrderPlacementAndTakeTrace = do
