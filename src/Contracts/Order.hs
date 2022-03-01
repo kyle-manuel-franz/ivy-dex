@@ -53,8 +53,14 @@ mkValidator OrderParams {..} dat r ctx =
         minRequiredFeeToBook :: Integer
         minRequiredFeeToBook = 1000000
 
+        ownerMakerFeeLovelace :: Integer
+        ownerMakerFeeLovelace = 1000000
+
         info :: TxInfo
         info = scriptContextTxInfo ctx
+
+        txFees :: Value
+        txFees = txInfoFee info
 
         ownInput :: TxInInfo
         ownInput = case findOwnInput ctx of
@@ -97,9 +103,9 @@ mkValidator OrderParams {..} dat r ctx =
         feesPaidToBook :: Bool
         feesPaidToBook = Ada.fromValue (valuePaidTo info $ odBook dat) >= Ada.lovelaceOf minRequiredFeeToBook
 
-        -- TODO: implement this
+        -- TODO: continue to implement this
         ownerMustGetTokensAndFees :: Bool
-        ownerMustGetTokensAndFees = True
+        ownerMustGetTokensAndFees = Ada.fromValue valueToOwner >= Ada.lovelaceOf ownerMakerFeeLovelace
 
         -- TODO: implement this
         signerMustRedeemValue :: Bool

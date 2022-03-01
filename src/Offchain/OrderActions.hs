@@ -94,10 +94,14 @@ takeOrder to = do
                               Constraints.otherScript (validator p)
                     tx :: Constraints.TxConstraints Void Void
                     tx = mconcat [Constraints.mustSpendScriptOutput oref red | oref <- orefs] <>
-                         (Constraints.mustPayToPubKey bookAddress (lovelaceValueOf 1000000))
+                         (Constraints.mustPayToPubKey bookAddress (lovelaceValueOf 1000000)) <>
+                         (Constraints.mustPayToPubKey (tOwner to) (lovelaceValueOf 1010000))
+                unbalancedTx <- mkTxConstraints @Void lookups tx
+                balancedTx <- balanceTx unbalancedTx
+                logInfo @String $ printf "Hello world %s" (show $ balancedTx)
                 ledgerTx <- submitTxConstraintsWith @Void lookups tx
                 void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
-                logInfo @String "Hello world"
+
 
         logInfo @String $ printf "take order endpoint %s" (show $ utxos)
     where

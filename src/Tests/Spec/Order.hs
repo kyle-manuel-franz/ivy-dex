@@ -28,20 +28,20 @@ bookWallet = knownWallet 9
 
 tests :: TestTree
 tests = testGroup "order"
-    [ checkPredicate "Expose lock endpoint"
+    [ checkPredicate "Can place an order"
       (
            assertNoFailedTransactions
       .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (-1000000))
       .&&. walletFundsChange bookWallet (Ada.lovelaceValueOf (1000000))
       )
-      myTrace
+      simpleOrderPlacementTrace
     ]
 
 test :: IO ()
 test = runEmulatorTraceIO myTrace
 
-myTrace :: EmulatorTrace ()
-myTrace = do
+simpleOrderPlacementTrace :: EmulatorTrace ()
+simpleOrderPlacementTrace = do
     let op = PlaceOrderParams {
         pOwner = walletPubKeyHash (knownWallet 1),
         pBook  = walletPubKeyHash bookWallet,
