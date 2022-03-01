@@ -27,7 +27,6 @@ bookWallet :: Wallet
 bookWallet = knownWallet 9
 
 -- TODO: Set the config fee structure
-
 tests :: TestTree
 tests = testGroup "order"
     [ checkPredicate "Can place an order"
@@ -46,9 +45,19 @@ tests = testGroup "order"
       checkPredicate "Can place and cancel order"
         (
              assertNoFailedTransactions
-          .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf 0)
+          .&&. walletFundsChange (knownWallet 1) (Ada.lovelaceValueOf 0)
         )
-        cancelOrderTrace
+        cancelOrderTrace,
+        checkPredicate "Can place and non owner cannot cancel order"
+        (
+             assertFailedTransaction (\
+                _ err _ -> case err of
+                    {
+                        ScriptFailure (EvaluationError ["Only owner can cancel order", "PT5"] _) -> True;
+                        _ -> False
+                    })
+        )
+        cancelOrderNonOwnerTrace
     ]
 
 test :: IO ()
@@ -77,6 +86,28 @@ cancelOrderTrace = do
 
     void $ Trace.waitNSlots 2
 
+cancelOrderNonOwnerTrace :: EmulatorTrace ()
+cancelOrderNonOwnerTrace = do
+    let op = PlaceOrderParams {
+        pOwner = walletPubKeyHash (knownWallet 1),
+        pBook  = walletPubKeyHash bookWallet,
+        pBuyValue = Ada.lovelaceValueOf 1000000,
+        pSellValue = Ada.lovelaceValueOf 1000000
+    }
+
+    h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
+    h2 <- activateContractWallet (knownWallet 2) orderActionEndpoints
+
+    callEndpoint @"placeOrder" h1 $ op
+    void $ Trace.waitNSlots 2
+
+    let co = CancelOrderParams {
+        cOwner = walletPubKeyHash (knownWallet 1)
+    }
+
+    callEndpoint @"cancelOrder" h2 $ co
+
+    void $ Trace.waitNSlots 2
 
 simpleOrderPlacementTrace :: EmulatorTrace ()
 simpleOrderPlacementTrace = do
@@ -91,7 +122,6 @@ simpleOrderPlacementTrace = do
 
     callEndpoint @"placeOrder" h1 $ op
     void $ Trace.waitNSlots 2
-
 
 simpleOrderPlacementAndTakeTrace :: EmulatorTrace ()
 simpleOrderPlacementAndTakeTrace = do
