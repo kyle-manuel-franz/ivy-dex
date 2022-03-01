@@ -32,16 +32,36 @@ tests = testGroup "order"
       (
            assertNoFailedTransactions
       .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (-1000000))
-      .&&. walletFundsChange bookWallet (Ada.lovelaceValueOf (1000000))
       )
-      simpleOrderPlacementTrace
+      simpleOrderPlacementTrace,
+      checkPredicate "Can place an order"
+      (
+           assertNoFailedTransactions
+        .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (-1000000))
+        .&&. walletFundsChange bookWallet (Ada.lovelaceValueOf (1000000))
+      )
+      simpleOrderPlacementAndTakeTrace
     ]
 
 test :: IO ()
-test = runEmulatorTraceIO myTrace
+test = runEmulatorTraceIO simpleOrderPlacementTrace
 
 simpleOrderPlacementTrace :: EmulatorTrace ()
 simpleOrderPlacementTrace = do
+    let op = PlaceOrderParams {
+        pOwner = walletPubKeyHash (knownWallet 1),
+        pBook  = walletPubKeyHash bookWallet,
+        pBuyValue = Ada.lovelaceValueOf 1000000,
+        pSellValue = Ada.lovelaceValueOf 1000000
+    }
+
+    h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
+
+    callEndpoint @"placeOrder" h1 $ op
+    void $ Trace.waitNSlots 2
+
+simpleOrderPlacementAndTakeTrace :: EmulatorTrace ()
+simpleOrderPlacementAndTakeTrace = do
     let op = PlaceOrderParams {
         pOwner = walletPubKeyHash (knownWallet 1),
         pBook  = walletPubKeyHash bookWallet,
