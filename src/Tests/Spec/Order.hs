@@ -47,3 +47,11 @@ myTrace = do
 
     callEndpoint @"placeOrder" h1 $ op
     void $ Trace.waitNSlots 2
+
+    callEndpoint @"takeOrder" h1 $ TakeOrderParams {
+        tOwner = walletPubKeyHash (knownWallet 1),
+        tBuyValue = Ada.lovelaceValueOf 1000000,
+        tSellValue = Ada.lovelaceValueOf 1000000
+    }
+
+    void $ Trace.waitNSlots 2

@@ -23,6 +23,7 @@ import           Control.Monad          hiding (fmap)
 import           Data.Aeson             (ToJSON, FromJSON)
 import           Data.Text              (Text)
 import           Data.Map               as Map
+import           Data.Void              (Void)
 import           GHC.Generics           (Generic)
 import           Ledger
 import           Ledger.Ada             as Ada
@@ -82,8 +83,22 @@ takeOrder :: AsContractError e => TakeOrderParams -> Contract w s e ()
 takeOrder to = do
         let bookAddress = Ledger.PubKeyHash "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a"
         let p = OrderParams { scriptVersion = "0.0.1" }
+        let red = Redeemer $ PlutusTx.toBuiltinData $ Take
         utxos <- Map.filter isSuitableUtxo <$> (utxosAt $ scrAddress p)
-        logInfo @String $ printf "take order endpoint"
+        if Map.null utxos
+            then logInfo @String $ "No utxos found"
+            else do
+                let orefs = fst <$> Map.toList utxos
+                    lookups = Constraints.unspentOutputs utxos <>
+                              Constraints.otherScript (validator p)
+
+                    tx :: Constraints.TxConstraints Void Void
+                    tx = mconcat [Constraints.mustSpendScriptOutput oref red | oref <- orefs]
+                ledgerTx <- submitTxConstraintsWith @Void lookups tx
+                void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
+                logInfo @String "Hello world"
+
+        logInfo @String $ printf "take order endpoint %s" (show $ utxos)
     where
         isSuitableUtxo :: ChainIndexTxOut -> Bool
         isSuitableUtxo o = case _ciTxOutDatum o of
