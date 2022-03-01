@@ -42,12 +42,19 @@ tests = testGroup "order"
         .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (10000))
         .&&. walletFundsChange bookWallet (Ada.lovelaceValueOf (1000000))
       )
-      simpleOrderPlacementAndTakeTrace
+      simpleOrderPlacementAndTakeTrace,
+      checkPredicate "Can place and cancel order"
+        (
+             assertNoFailedTransactions
+          .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf 0)
+        )
+        cancelOrderTrace
     ]
 
 test :: IO ()
-test = runEmulatorTraceIO simpleOrderPlacementAndTakeTrace
+test = runEmulatorTraceIO cancelOrderTrace
 
+-- TODO: need to get fees config setup because its impossible to predict fees
 cancelOrderTrace :: EmulatorTrace ()
 cancelOrderTrace = do
     let op = PlaceOrderParams {

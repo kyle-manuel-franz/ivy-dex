@@ -78,7 +78,19 @@ placeOrder op = do
 
 cancelOrder :: AsContractError e => CancelOrderParams -> Contract w s e ()
 cancelOrder co = do
-    logInfo @String $ printf "cancel order endpoint"
+    let p = OrderParams { scriptVersion = "0.0.1" }
+    let red = Redeemer $ PlutusTx.toBuiltinData $ Cancel
+    utxos <- utxosAt $ scrAddress p
+    if Map.null utxos
+        then logInfo @String $ "No utxos found"
+        else do
+            let orefs = fst <$> Map.toList utxos
+                lookups = Constraints.unspentOutputs utxos <>
+                          Constraints.otherScript (validator p)
+                tx :: Constraints.TxConstraints Void Void
+                tx = mconcat [Constraints.mustSpendScriptOutput oref red | oref <- orefs]
+            ledgerTx <- submitTxConstraintsWith @Void lookups tx
+            void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
 
 takeOrder :: AsContractError e => TakeOrderParams -> Contract w s e ()
 takeOrder to = do
