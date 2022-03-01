@@ -95,15 +95,9 @@ takeOrder to = do
                     tx :: Constraints.TxConstraints Void Void
                     tx = mconcat [Constraints.mustSpendScriptOutput oref red | oref <- orefs] <>
                          (Constraints.mustPayToPubKey bookAddress (lovelaceValueOf 1000000)) <>
-                         (Constraints.mustPayToPubKey (tOwner to) (lovelaceValueOf 1010000))
-                unbalancedTx <- mkTxConstraints @Void lookups tx
-                balancedTx <- balanceTx unbalancedTx
-                logInfo @String $ printf "Hello world %s" (show $ balancedTx)
+                         (Constraints.mustPayToPubKey (tOwner to) (lovelaceValueOf 1010000)) -- this covers the fees
                 ledgerTx <- submitTxConstraintsWith @Void lookups tx
                 void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
-
-
-        logInfo @String $ printf "take order endpoint %s" (show $ utxos)
     where
         isSuitableUtxo :: ChainIndexTxOut -> Bool
         isSuitableUtxo o = case _ciTxOutDatum o of
