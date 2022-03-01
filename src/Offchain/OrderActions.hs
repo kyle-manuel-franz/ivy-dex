@@ -52,6 +52,7 @@ data CancelOrderParams = CancelOrderParams {
 
 data TakeOrderParams = TakeOrderParams {
     tOwner     :: !PubKeyHash,
+    tBook      :: !PubKeyHash,
     tBuyValue  :: !Value,
     tSellValue :: !Value
 } deriving (Generic, ToJSON, FromJSON, ToSchema)
@@ -65,7 +66,7 @@ placeOrder :: AsContractError e => PlaceOrderParams -> Contract w s e ()
 placeOrder op = do
         let dat = OrderDatum {
                 odOwner = pOwner op,
-                odBook = Ledger.PubKeyHash "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a",
+                odBook = pBook op,
                 odBuyValue = pBuyValue op,
                 odSellValue = pSellValue op
             }
@@ -81,7 +82,7 @@ cancelOrder co = do
 
 takeOrder :: AsContractError e => TakeOrderParams -> Contract w s e ()
 takeOrder to = do
-        let bookAddress = Ledger.PubKeyHash "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a"
+        let bookAddress = tBook to
         let p = OrderParams { scriptVersion = "0.0.1" }
         let red = Redeemer $ PlutusTx.toBuiltinData $ Take
         utxos <- Map.filter isSuitableUtxo <$> (utxosAt $ scrAddress p)
@@ -91,9 +92,9 @@ takeOrder to = do
                 let orefs = fst <$> Map.toList utxos
                     lookups = Constraints.unspentOutputs utxos <>
                               Constraints.otherScript (validator p)
-
                     tx :: Constraints.TxConstraints Void Void
-                    tx = mconcat [Constraints.mustSpendScriptOutput oref red | oref <- orefs]
+                    tx = mconcat [Constraints.mustSpendScriptOutput oref red | oref <- orefs] <>
+                         (Constraints.mustPayToPubKey bookAddress (lovelaceValueOf 1000000))
                 ledgerTx <- submitTxConstraintsWith @Void lookups tx
                 void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
                 logInfo @String "Hello world"

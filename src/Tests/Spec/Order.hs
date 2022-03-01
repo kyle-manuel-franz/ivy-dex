@@ -23,11 +23,17 @@ import qualified Plutus.Trace.Emulator         as Trace
 import           Test.Tasty
 import qualified Test.Tasty.HUnit              as HUnit
 
+bookWallet :: Wallet
+bookWallet = knownWallet 9
+
 tests :: TestTree
 tests = testGroup "order"
     [ checkPredicate "Expose lock endpoint"
-      (assertNoFailedTransactions
-      .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (-1000000)))
+      (
+           assertNoFailedTransactions
+      .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (-1000000))
+      .&&. walletFundsChange bookWallet (Ada.lovelaceValueOf (1000000))
+      )
       myTrace
     ]
 
@@ -38,7 +44,7 @@ myTrace :: EmulatorTrace ()
 myTrace = do
     let op = PlaceOrderParams {
         pOwner = walletPubKeyHash (knownWallet 1),
-        pBook  = walletPubKeyHash (knownWallet 9),
+        pBook  = walletPubKeyHash bookWallet,
         pBuyValue = Ada.lovelaceValueOf 1000000,
         pSellValue = Ada.lovelaceValueOf 1000000
     }
@@ -50,6 +56,7 @@ myTrace = do
 
     callEndpoint @"takeOrder" h1 $ TakeOrderParams {
         tOwner = walletPubKeyHash (knownWallet 1),
+        tBook  = walletPubKeyHash bookWallet,
         tBuyValue = Ada.lovelaceValueOf 1000000,
         tSellValue = Ada.lovelaceValueOf 1000000
     }
