@@ -18,6 +18,7 @@ import           Plutus.Contract
 import           Prelude                        (IO, String, Show (..))
 import           Control.Monad                  (void)
 import           Ledger
+import           Ledger.Fee
 import qualified Ledger.Ada                     as Ada
 import           Ledger.Value                   as Value
 import           Plutus.Contract               (Contract, ContractError(WalletError))
@@ -41,8 +42,11 @@ name = "A"
 token :: AssetClass
 token = AssetClass (currency, name)
 
+fc :: FeeConfig
+fc = FeeConfig { fcConstantFee = Ada.lovelaceOf 1_000, fcScriptsFeeFactor = 0.0 }
+
 emCfg :: EmulatorConfig
-emCfg = EmulatorConfig (Left $ Map.fromList [(knownWallet w, v) | w <- [1 .. 10]]) def def
+emCfg = EmulatorConfig (Left $ Map.fromList [(knownWallet w, v) | w <- [1 .. 10]]) def fc
     where
         v :: Value
         v = Ada.lovelaceValueOf 1_000_000_000 <> assetClassValue token 1_000
@@ -69,17 +73,17 @@ tests = testGroup "order"
                assertNoFailedTransactions
           .&&. walletFundsChange (knownWallet 1) (Ada.lovelaceValueOf 0)
       )
-         cancelOrderTrace,
-         checkPredicate "Can place and non owner cannot cancel order"
-         (
-             assertFailedTransaction (\
-                _ err _ -> case err of
-                    {
-                        ScriptFailure (EvaluationError ["Only owner can cancel order", "PT5"] _) -> True;
-                        _ -> False
-                })
-         )
-         cancelOrderNonOwnerTrace
+      cancelOrderTrace,
+      checkPredicate "Can place and non owner cannot cancel order"
+      (
+         assertFailedTransaction (\
+            _ err _ -> case err of
+                {
+                    ScriptFailure (EvaluationError ["Only owner can cancel order", "PT5"] _) -> True;
+                    _ -> False
+            })
+      )
+      cancelOrderNonOwnerTrace
     ]
 
 test :: IO ()
