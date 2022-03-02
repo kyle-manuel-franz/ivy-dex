@@ -56,7 +56,9 @@ library
       text,
       tasty,
       tasty-hunit,
-      plutus-ledger-api
+      plutus-ledger-api,
+      data-default,
+      lens
     hs-source-dirs: src
 
 test-suite ivy-dex-test

@@ -3,65 +3,87 @@
 {-# LANGUAGE TypeApplications   #-}
 {-# LANGUAGE NumericUnderscores #-}
 {-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
 
 module Tests.Spec.Order where
 
 import           Offchain.OrderActions
 import           Control.Monad.Freer.Extras     as Extras
+import           Control.Lens
+import           Data.Default                   (Default (..))
+import qualified Data.Map                       as Map
 import           Plutus.Trace
 import           Test.Tasty
 import           Plutus.Contract
-import           Prelude
+import           Prelude                        (IO, String, Show (..))
 import           Control.Monad                  (void)
 import           Ledger
 import qualified Ledger.Ada                     as Ada
+import           Ledger.Value                   as Value
 import           Plutus.Contract               (Contract, ContractError(WalletError))
 import           Wallet.API                    (WalletAPIError(ValidationError))
 import           Plutus.Contract.Test
 import           Plutus.Trace.Emulator         (ContractInstanceTag)
 import qualified Plutus.Trace.Emulator         as Trace
+import           PlutusTx.Prelude
 import           Test.Tasty
 import qualified Test.Tasty.HUnit              as HUnit
 
 bookWallet :: Wallet
 bookWallet = knownWallet 9
 
+currency :: CurrencySymbol
+currency = "aa"
+
+name :: TokenName
+name = "A"
+
+token :: AssetClass
+token = AssetClass (currency, name)
+
+emCfg :: EmulatorConfig
+emCfg = EmulatorConfig (Left $ Map.fromList [(knownWallet w, v) | w <- [1 .. 10]]) def def
+    where
+        v :: Value
+        v = Ada.lovelaceValueOf 1_000_000_000 <> assetClassValue token 1_000
+
+
 -- TODO: Set the config fee structure
 tests :: TestTree
 tests = testGroup "order"
-    [ checkPredicate "Can place an order"
+    [ checkPredicateOptions (defaultCheckOptions & emulatorConfig .~ emCfg) "Can place an order"
       (
-           assertNoFailedTransactions
-      .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (-1000000))
+              assertNoFailedTransactions
+         .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (-1000000))
       )
       simpleOrderPlacementTrace,
       checkPredicate "Can place and take order"
       (
-           assertNoFailedTransactions
+             assertNoFailedTransactions
         .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (10000))
         .&&. walletFundsChange bookWallet (Ada.lovelaceValueOf (1000000))
       )
       simpleOrderPlacementAndTakeTrace,
       checkPredicate "Can place and cancel order"
-        (
-             assertNoFailedTransactions
+      (
+               assertNoFailedTransactions
           .&&. walletFundsChange (knownWallet 1) (Ada.lovelaceValueOf 0)
-        )
-        cancelOrderTrace,
-        checkPredicate "Can place and non owner cannot cancel order"
-        (
+      )
+         cancelOrderTrace,
+         checkPredicate "Can place and non owner cannot cancel order"
+         (
              assertFailedTransaction (\
                 _ err _ -> case err of
                     {
                         ScriptFailure (EvaluationError ["Only owner can cancel order", "PT5"] _) -> True;
                         _ -> False
-                    })
-        )
-        cancelOrderNonOwnerTrace
+                })
+         )
+         cancelOrderNonOwnerTrace
     ]
 
 test :: IO ()
-test = runEmulatorTraceIO cancelOrderTrace
+test = runEmulatorTraceIO' def emCfg cancelOrderTrace
 
 -- TODO: need to get fees config setup because its impossible to predict fees
 cancelOrderTrace :: EmulatorTrace ()
