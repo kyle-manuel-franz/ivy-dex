@@ -51,8 +51,6 @@ emCfg = EmulatorConfig (Left $ Map.fromList [(knownWallet w, v) | w <- [1 .. 10]
         v :: Value
         v = Ada.lovelaceValueOf 1_000_000_000 <> assetClassValue token 1_000
 
-
--- TODO: Set the config fee structure
 tests :: TestTree
 tests = testGroup "order"
     [ checkPredicateOptions (defaultCheckOptions & emulatorConfig .~ emCfg) "Can place an order"
@@ -70,8 +68,8 @@ tests = testGroup "order"
       simpleOrderPlacementAndTakeTrace,
       checkPredicate "Can place and cancel order"
       (
-               assertNoFailedTransactions
-          .&&. walletFundsChange (knownWallet 1) (Ada.lovelaceValueOf 0)
+              assertNoFailedTransactions
+         .&&. walletFundsChange (knownWallet 1) (Ada.lovelaceValueOf 0)
       )
       cancelOrderTrace,
       checkPredicate "Can place and non owner cannot cancel order"
@@ -89,7 +87,6 @@ tests = testGroup "order"
 test :: IO ()
 test = runEmulatorTraceIO' def emCfg cancelOrderTrace
 
--- TODO: need to get fees config setup because its impossible to predict fees
 cancelOrderTrace :: EmulatorTrace ()
 cancelOrderTrace = do
     let op = PlaceOrderParams {
@@ -109,7 +106,6 @@ cancelOrderTrace = do
     }
 
     callEndpoint @"cancelOrder" h1 $ co
-
     void $ Trace.waitNSlots 2
 
 cancelOrderNonOwnerTrace :: EmulatorTrace ()
@@ -132,7 +128,6 @@ cancelOrderNonOwnerTrace = do
     }
 
     callEndpoint @"cancelOrder" h2 $ co
-
     void $ Trace.waitNSlots 2
 
 simpleOrderPlacementTrace :: EmulatorTrace ()
