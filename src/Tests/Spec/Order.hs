@@ -69,6 +69,16 @@ tests = testGroup "order"
         .&&. walletFundsChange bookWallet (Ada.lovelaceValueOf (10000))
       )
       simpleOrderPlacementAndTakeTrace,
+      checkPredicateOptions (defaultCheckOptions & emulatorConfig .~ emCfg)  "Can place and not take order if wrong value paid"
+      (
+         assertFailedTransaction (\
+         _ err _ -> case err of
+             {
+                 ScriptFailure (EvaluationError ["Owner must get the tokens and fees", "PT5"] _) -> True;
+                 _ -> False
+         })
+      )
+      ownerMustGetPaidCorrectTokenTrace,
       checkPredicate "Can place and cancel order"
       (
               assertNoFailedTransactions
@@ -167,6 +177,32 @@ simpleOrderPlacementAndTakeTrace = do
         tBook  = walletPubKeyHash bookWallet,
         tBuyValue = Ada.lovelaceValueOf 100000,
         tSellValue = av
+    }
+
+    void $ Trace.waitNSlots 2
+
+ownerMustGetPaidCorrectTokenTrace :: EmulatorTrace ()
+ownerMustGetPaidCorrectTokenTrace = do
+    let op = PlaceOrderParams {
+            pOwner = walletPubKeyHash (knownWallet 1),
+            pBook  = walletPubKeyHash bookWallet,
+            pBuyValue = Ada.lovelaceValueOf 100000,
+            pSellValue = av
+        }
+
+    h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
+    h2 <- activateContractWallet (knownWallet 2) orderActionEndpoints
+
+    callEndpoint @"placeOrder" h1 $ op
+    void $ Trace.waitNSlots 2
+
+    let wrongVal = Value.singleton currency name 1_000
+
+    callEndpoint @"takeOrder" h2 $ TakeOrderParams {
+        tOwner = walletPubKeyHash (knownWallet 1),
+        tBook  = walletPubKeyHash bookWallet,
+        tBuyValue = Ada.lovelaceValueOf 100000,
+        tSellValue = wrongVal
     }
 
     void $ Trace.waitNSlots 2
