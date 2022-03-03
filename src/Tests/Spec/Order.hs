@@ -65,8 +65,8 @@ tests = testGroup "order"
       checkPredicateOptions (defaultCheckOptions & emulatorConfig .~ emCfg)  "Can place and take order"
       (
              assertNoFailedTransactions
-        .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (10000))
-        .&&. walletFundsChange bookWallet (Ada.lovelaceValueOf (1000000))
+        .&&. walletFundsChange (knownWallet 1)(av <> (Ada.lovelaceValueOf (-100000)))
+        .&&. walletFundsChange bookWallet (Ada.lovelaceValueOf (10000))
       )
       simpleOrderPlacementAndTakeTrace,
       checkPredicate "Can place and cancel order"
@@ -139,7 +139,7 @@ simpleOrderPlacementTrace = do
         pOwner = walletPubKeyHash (knownWallet 1),
         pBook  = walletPubKeyHash bookWallet,
         pBuyValue = Ada.lovelaceValueOf 1000000,
-        pSellValue = Ada.lovelaceValueOf 1000000
+        pSellValue = av
     }
 
     h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
