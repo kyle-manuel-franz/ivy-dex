@@ -101,6 +101,7 @@ mkValidator OrderParams {..} dat r ctx =
         sellerTotalValue :: Value
         sellerTotalValue = mconcat sellerTotalValues
 
+        -- need to make sure they get the maker fee in addition to this fee
         feesPaidToBook :: Bool
         feesPaidToBook = Ada.fromValue (valuePaidTo info $ odBook dat) == Ada.lovelaceOf minRequiredFeeToBook
 

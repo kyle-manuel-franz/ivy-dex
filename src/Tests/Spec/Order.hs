@@ -42,6 +42,9 @@ name = "A"
 token :: AssetClass
 token = AssetClass (currency, name)
 
+av :: Value
+av = Value.singleton currency name 10_000
+
 fc :: FeeConfig
 fc = FeeConfig { fcConstantFee = Ada.lovelaceOf 1_000, fcScriptsFeeFactor = 0.0 }
 
@@ -49,7 +52,7 @@ emCfg :: EmulatorConfig
 emCfg = EmulatorConfig (Left $ Map.fromList [(knownWallet w, v) | w <- [1 .. 10]]) def fc
     where
         v :: Value
-        v = Ada.lovelaceValueOf 1_000_000_000 <> assetClassValue token 1_000
+        v = Ada.lovelaceValueOf 1_000_000_000 <> assetClassValue token 1_000_000
 
 tests :: TestTree
 tests = testGroup "order"
@@ -150,7 +153,7 @@ simpleOrderPlacementAndTakeTrace = do
         pOwner = walletPubKeyHash (knownWallet 1),
         pBook  = walletPubKeyHash bookWallet,
         pBuyValue = Ada.lovelaceValueOf 100000,
-        pSellValue = Ada.lovelaceValueOf 1000000
+        pSellValue = av
     }
 
     h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
@@ -163,7 +166,7 @@ simpleOrderPlacementAndTakeTrace = do
         tOwner = walletPubKeyHash (knownWallet 1),
         tBook  = walletPubKeyHash bookWallet,
         tBuyValue = Ada.lovelaceValueOf 100000,
-        tSellValue = Ada.lovelaceValueOf 1000000
+        tSellValue = av
     }
 
     void $ Trace.waitNSlots 2
