@@ -170,3 +170,10 @@ simpleOrderPlacementAndTakeTrace = do
     }
 
     void $ Trace.waitNSlots 2
+
+
+-- TODO: Test Double Spend
+doubleSpendTrace :: EmulatorTrace ()
+doubleSpendTrace = do
+
+    void $ Trace.waitNSlots 2
