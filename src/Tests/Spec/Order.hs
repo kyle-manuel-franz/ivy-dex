@@ -149,7 +149,7 @@ simpleOrderPlacementAndTakeTrace = do
     let op = PlaceOrderParams {
         pOwner = walletPubKeyHash (knownWallet 1),
         pBook  = walletPubKeyHash bookWallet,
-        pBuyValue = Ada.lovelaceValueOf 1000000,
+        pBuyValue = Ada.lovelaceValueOf 100000,
         pSellValue = Ada.lovelaceValueOf 1000000
     }
 
@@ -162,7 +162,7 @@ simpleOrderPlacementAndTakeTrace = do
     callEndpoint @"takeOrder" h2 $ TakeOrderParams {
         tOwner = walletPubKeyHash (knownWallet 1),
         tBook  = walletPubKeyHash bookWallet,
-        tBuyValue = Ada.lovelaceValueOf 1000000,
+        tBuyValue = Ada.lovelaceValueOf 100000,
         tSellValue = Ada.lovelaceValueOf 1000000
     }
 

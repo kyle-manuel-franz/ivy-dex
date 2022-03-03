@@ -71,7 +71,7 @@ placeOrder op = do
                 odSellValue = pSellValue op
             }
         let p = OrderParams { scriptVersion = "0.0.1" }
-            tx = Constraints.mustPayToTheScript dat $ (odSellValue dat)
+            tx = Constraints.mustPayToTheScript dat $ (odBuyValue dat)
         ledgerTx <- submitTxConstraints ( typedValidator p ) tx
         void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
         logInfo @String $ printf "place order endpoint"
