@@ -2,6 +2,28 @@
 Official Ivy DEX github repo started from the Plutus starter project from IOHK.
 
 
+# Running Tests
+
+Start the nix shell: 
+
+`nix-shell`
+
+Load up cabal repl:
+
+`cabal repl`
+
+Load the Tests.Spec.Order test module into the repl:
+
+`:l Tests.Spec.Order`
+
+Import Tasty.Test module into the repl:
+
+`import Tasty.Test`
+
+Run the tests:
+
+`defaultMain tests`
+
 
 # Plutus Platform starter project
 ![CI](https://github.com/input-output-hk/plutus-starter/actions/workflows/test.yml/badge.svg?branch=main)
