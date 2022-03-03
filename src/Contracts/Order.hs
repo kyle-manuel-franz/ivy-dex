@@ -12,6 +12,7 @@
 {-# LANGUAGE TypeOperators         #-}
 {-# LANGUAGE EmptyDataDecls        #-}
 {-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE NumericUnderscores #-}
 
 module Contracts.Order where
 
@@ -51,7 +52,7 @@ mkValidator OrderParams {..} dat r ctx =
                             traceIfFalse "Only owner can cancel order" signedByOwner
     where
         minRequiredFeeToBook :: Integer
-        minRequiredFeeToBook = 1000000
+        minRequiredFeeToBook = 10000
 
         ownerMakerFeeLovelace :: Integer
         ownerMakerFeeLovelace = 1000000
@@ -101,11 +102,10 @@ mkValidator OrderParams {..} dat r ctx =
         sellerTotalValue = mconcat sellerTotalValues
 
         feesPaidToBook :: Bool
-        feesPaidToBook = Ada.fromValue (valuePaidTo info $ odBook dat) >= Ada.lovelaceOf minRequiredFeeToBook
+        feesPaidToBook = Ada.fromValue (valuePaidTo info $ odBook dat) == Ada.lovelaceOf minRequiredFeeToBook
 
-        -- TODO: continue to implement this
         ownerMustGetTokensAndFees :: Bool
-        ownerMustGetTokensAndFees = Ada.fromValue valueToOwner >= Ada.lovelaceOf ownerMakerFeeLovelace
+        ownerMustGetTokensAndFees = valueToOwner == odSellValue dat
 
         -- TODO: implement this
         signerMustRedeemValue :: Bool

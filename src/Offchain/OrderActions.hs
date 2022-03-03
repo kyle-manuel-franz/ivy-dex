@@ -106,8 +106,8 @@ takeOrder to = do
                               Constraints.otherScript (validator p)
                     tx :: Constraints.TxConstraints Void Void
                     tx = mconcat [Constraints.mustSpendScriptOutput oref red | oref <- orefs] <>
-                         (Constraints.mustPayToPubKey bookAddress (lovelaceValueOf 1000000)) <>
-                         (Constraints.mustPayToPubKey (tOwner to) (lovelaceValueOf 1010000)) -- this covers the fees
+                         (Constraints.mustPayToPubKey bookAddress (lovelaceValueOf 10000)) <>
+                         (Constraints.mustPayToPubKey (tOwner to) (tSellValue to))
                 ledgerTx <- submitTxConstraintsWith @Void lookups tx
                 void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
     where

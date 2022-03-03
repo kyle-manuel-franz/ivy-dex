@@ -59,7 +59,7 @@ tests = testGroup "order"
          .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (-1000000))
       )
       simpleOrderPlacementTrace,
-      checkPredicate "Can place and take order"
+      checkPredicateOptions (defaultCheckOptions & emulatorConfig .~ emCfg)  "Can place and take order"
       (
              assertNoFailedTransactions
         .&&. walletFundsChange (knownWallet 1)(Ada.lovelaceValueOf (10000))
@@ -85,7 +85,7 @@ tests = testGroup "order"
     ]
 
 test :: IO ()
-test = runEmulatorTraceIO' def emCfg cancelOrderTrace
+test = runEmulatorTraceIO' def emCfg simpleOrderPlacementAndTakeTrace
 
 cancelOrderTrace :: EmulatorTrace ()
 cancelOrderTrace = do
