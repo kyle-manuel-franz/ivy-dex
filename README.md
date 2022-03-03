@@ -24,6 +24,18 @@ Run the tests:
 
 `defaultMain tests`
 
+You should see something like this (tests may differ from this output):
+```
+order
+  Can place an order:                               OK (0.16s)
+  Can place and take order:                         OK (0.11s)
+  Can place and not take order if wrong value paid: OK (0.09s)
+  Can place and cancel order:                       OK (0.09s)
+  Can place and non owner cannot cancel order:      OK (0.07s)
+
+All 5 tests passed (0.53s)
+```
+
 
 # Plutus Platform starter project
 ![CI](https://github.com/input-output-hk/plutus-starter/actions/workflows/test.yml/badge.svg?branch=main)
