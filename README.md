@@ -2,7 +2,7 @@
 Official Ivy DEX github repo started from the Plutus starter project from IOHK.
 
 This is for my daily commit. I'm in San Jose looking for a new apartment. Drove 8 hours from Bend Oregon and I need my green square.
-
+This is a second daily commit. Now we will move to SF.
 # Running Tests
 
 Start the nix shell: 
