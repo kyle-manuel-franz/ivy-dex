@@ -1,7 +1,6 @@
 # Ivy DEX
 Official Ivy DEX github repo started from the Plutus starter project from IOHK.
 
-
 # Running Tests
 
 Start the nix shell: 
