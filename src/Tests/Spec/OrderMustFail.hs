@@ -29,5 +29,3 @@ import qualified Plutus.Trace.Emulator         as Trace
 import           PlutusTx.Prelude
 import           Test.Tasty
 import qualified Test.Tasty.HUnit              as HUnit
-
--- TODO: Put failure tests cases here to assert that these transactions fail
