@@ -58,7 +58,9 @@ library
       tasty-hunit,
       plutus-ledger-api,
       data-default,
-      lens
+      lens,
+      cardano-api,
+      serialise,
     hs-source-dirs: src
 
 test-suite ivy-dex-test
