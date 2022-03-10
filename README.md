@@ -35,6 +35,20 @@ order
 All 5 tests passed (0.53s)
 ```
 
+# Build new plutus file
+Load up nix shell env
+`nix-shell`
+
+Run cabal repl
+`cabal repl`
+
+Load the Deploy.Order module
+`:l Deploy.Order`
+
+Run the write order validator function with an integer passed as the version number
+`writeOrderValidator <version>`
+
+You should see a file in the `dist/testnet` folder called `order_v_<version>.plutus`
 
 # Plutus Platform starter project
 ![CI](https://github.com/input-output-hk/plutus-starter/actions/workflows/test.yml/badge.svg?branch=main)

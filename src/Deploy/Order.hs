@@ -26,8 +26,8 @@ dataToScriptData (B bs)        = ScriptDataBytes bs
 writeValidator :: FilePath -> Ledger.Validator -> IO (Either (FileError ()) ())
 writeValidator file = writeFileTextEnvelope @(PlutusScript PlutusScriptV1) file Nothing . PlutusScriptSerialised . SBS.toShort . LBS.toStrict . serialise . Ledger.unValidatorScript
 
-writeVestingValidator :: Integer -> IO (Either (FileError ()) ())
-writeVestingValidator v = writeValidator ("dist/testnet/order_v_"++(show v)++".plutus") $ validator $ OrderParams
+writeOrderValidator :: Integer -> IO (Either (FileError ()) ())
+writeOrderValidator v = writeValidator ("dist/testnet/order_v_"++(show v)++".plutus") $ validator $ OrderParams
     { scriptVersion = "0.0.1"
     }
 
