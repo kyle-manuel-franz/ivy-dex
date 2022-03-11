@@ -23,6 +23,19 @@ import qualified Ledger.Typed.Scripts      as Scripts
 import qualified PlutusTx
 import           PlutusTx.Prelude
 
+data OrderDatumNew = OrderDatumNew
+    {
+        odnOwner                :: PubKeyHash,
+        odnBook                 :: PubKeyHash,
+        odnBuyerTokenName       :: TokenName,
+        odnBuyerCurrencySymbol  :: CurrencySymbol,
+        odnBuyerTokenAmount     :: Integer,
+        odnSellerTokenName      :: TokenName,
+        odnSellerCurrencySymbol :: CurrencySymbol,
+        odnSellerTokenAmount    :: Integer
+    }
+PlutusTx.unstableMakeIsData ''OrderDatumNew
+
 data OrderDatum = OrderDatum
     {
         odOwner      :: PubKeyHash,
