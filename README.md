@@ -17,7 +17,7 @@ Load the Tests.Spec.Order test module into the repl:
 
 Import Tasty.Test module into the repl:
 
-`import Tasty.Test`
+`import Test.Tasty`
 
 Run the tests:
 
