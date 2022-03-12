@@ -65,7 +65,7 @@ tests = testGroup "order"
       checkPredicateOptions (defaultCheckOptions & emulatorConfig .~ emCfg)  "Can place and take order"
       (
              assertNoFailedTransactions
-        .&&. walletFundsChange (knownWallet 1)(av <> (Ada.lovelaceValueOf (-100000)))
+        .&&. walletFundsChange (knownWallet 1)(av <> (Ada.lovelaceValueOf (-1000000)))
         .&&. walletFundsChange bookWallet (Ada.lovelaceValueOf (10000))
       )
       simpleOrderPlacementAndTakeTrace,
@@ -105,8 +105,14 @@ cancelOrderTrace = do
     let op = PlaceOrderParams {
         pOwner = walletPubKeyHash (knownWallet 1),
         pBook  = walletPubKeyHash bookWallet,
-        pBuyValue = Ada.lovelaceValueOf 1000000,
-        pSellValue = Ada.lovelaceValueOf 1000000
+
+        pBuyTokenName       = Ada.adaToken,
+        pBuyCurrencySymbol  = Ada.adaSymbol,
+        pBuyTokenAmount     = 1000000,
+
+        pSellTokenName      = Ada.adaToken,
+        pSellCurrencySymbol = Ada.adaSymbol,
+        pSellTokenAmount    = 1000000
     }
 
     h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
@@ -126,8 +132,14 @@ cancelOrderNonOwnerTrace = do
     let op = PlaceOrderParams {
         pOwner = walletPubKeyHash (knownWallet 1),
         pBook  = walletPubKeyHash bookWallet,
-        pBuyValue = Ada.lovelaceValueOf 1000000,
-        pSellValue = Ada.lovelaceValueOf 1000000
+
+        pBuyTokenName       = Ada.adaToken,
+        pBuyCurrencySymbol  = Ada.adaSymbol,
+        pBuyTokenAmount     = 1000000,
+
+        pSellTokenName      = Ada.adaToken,
+        pSellCurrencySymbol = Ada.adaSymbol,
+        pSellTokenAmount    = 1000000
     }
 
     h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
@@ -148,8 +160,14 @@ simpleOrderPlacementTrace = do
     let op = PlaceOrderParams {
         pOwner = walletPubKeyHash (knownWallet 1),
         pBook  = walletPubKeyHash bookWallet,
-        pBuyValue = Ada.lovelaceValueOf 1000000,
-        pSellValue = av
+
+        pBuyTokenName       = Ada.adaToken,
+        pBuyCurrencySymbol  = Ada.adaSymbol,
+        pBuyTokenAmount     = 1000000,
+
+        pSellTokenName      = name,
+        pSellCurrencySymbol = currency,
+        pSellTokenAmount    = 10_000
     }
 
     h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
@@ -162,8 +180,14 @@ simpleOrderPlacementAndTakeTrace = do
     let op = PlaceOrderParams {
         pOwner = walletPubKeyHash (knownWallet 1),
         pBook  = walletPubKeyHash bookWallet,
-        pBuyValue = Ada.lovelaceValueOf 100000,
-        pSellValue = av
+
+        pBuyTokenName       = Ada.adaToken,
+        pBuyCurrencySymbol  = Ada.adaSymbol,
+        pBuyTokenAmount     = 1000000,
+
+        pSellTokenName      = name,
+        pSellCurrencySymbol = currency,
+        pSellTokenAmount    = 10_000
     }
 
     h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
@@ -184,11 +208,17 @@ simpleOrderPlacementAndTakeTrace = do
 ownerMustGetPaidCorrectTokenTrace :: EmulatorTrace ()
 ownerMustGetPaidCorrectTokenTrace = do
     let op = PlaceOrderParams {
-            pOwner = walletPubKeyHash (knownWallet 1),
-            pBook  = walletPubKeyHash bookWallet,
-            pBuyValue = Ada.lovelaceValueOf 100000,
-            pSellValue = av
-        }
+        pOwner = walletPubKeyHash (knownWallet 1),
+        pBook  = walletPubKeyHash bookWallet,
+
+        pBuyTokenName       = Ada.adaToken,
+        pBuyCurrencySymbol  = Ada.adaSymbol,
+        pBuyTokenAmount     = 1000000,
+
+        pSellTokenName      = name,
+        pSellCurrencySymbol = currency,
+        pSellTokenAmount    = 10_000
+    }
 
     h1 <- activateContractWallet (knownWallet 1) orderActionEndpoints
     h2 <- activateContractWallet (knownWallet 2) orderActionEndpoints

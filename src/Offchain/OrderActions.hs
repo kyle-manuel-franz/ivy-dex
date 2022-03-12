@@ -28,6 +28,7 @@ import           GHC.Generics           (Generic)
 import           Ledger
 import           Ledger.Ada             as Ada
 import qualified Ledger.Constraints     as Constraints
+import           Ledger.Value           as Value
 import           Playground.Contract    (ToSchema)
 import           Plutus.Contract
 import           PlutusTx               (Data (..))
@@ -40,10 +41,17 @@ import           Text.Printf            (printf)
 import           Contracts.Order
 
 data PlaceOrderParams = PlaceOrderParams {
-    pOwner     :: !PubKeyHash,
-    pBook      :: !PubKeyHash,
-    pBuyValue  :: !Value,
-    pSellValue :: !Value
+    pOwner                 :: !PubKeyHash,
+    pBook                  :: !PubKeyHash,
+
+    pBuyTokenName          :: !TokenName,
+    pBuyCurrencySymbol     :: !CurrencySymbol,
+    pBuyTokenAmount        :: !Integer,
+
+    pSellTokenName         :: !TokenName,
+    pSellCurrencySymbol    :: !CurrencySymbol,
+    pSellTokenAmount       :: !Integer
+
 } deriving (Generic, ToJSON, FromJSON, ToSchema)
 
 data CancelOrderParams = CancelOrderParams {
@@ -67,11 +75,18 @@ placeOrder op = do
         let dat = OrderDatum {
                 odOwner = pOwner op,
                 odBook = pBook op,
-                odBuyValue = pBuyValue op,
-                odSellValue = pSellValue op
+
+                odBuyerTokenName = (pBuyTokenName op),
+                odBuyerCurrencySymbol = (pBuyCurrencySymbol op),
+                odBuyerTokenAmount = (pBuyTokenAmount op),
+
+                odSellerTokenName = (pSellTokenName op),
+                odSellerCurrencySymbol = (pSellCurrencySymbol op),
+                odSellerTokenAmount = (pSellTokenAmount op)
             }
+        let scriptPaymentValue = Value.singleton (pBuyCurrencySymbol op) (pBuyTokenName op) (pBuyTokenAmount op)
         let p = OrderParams { scriptVersion = "0.0.1" }
-            tx = Constraints.mustPayToTheScript dat $ (odBuyValue dat)
+            tx = Constraints.mustPayToTheScript dat $ scriptPaymentValue
         ledgerTx <- submitTxConstraints ( typedValidator p ) tx
         void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
         logInfo @String $ printf "place order endpoint"

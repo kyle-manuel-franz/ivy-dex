@@ -16,32 +16,25 @@
 
 module Contracts.Order where
 
-import           Ledger.Ada          as Ada
-import           Ledger               hiding (singleton)
-import           Ledger.Value         as Value
+import           Ledger.Ada                as Ada
+import           Ledger                    hiding (singleton)
+import           Ledger.Value              as Value
 import qualified Ledger.Typed.Scripts      as Scripts
 import qualified PlutusTx
 import           PlutusTx.Prelude
 
-data OrderDatumNew = OrderDatumNew
-    {
-        odnOwner                :: PubKeyHash,
-        odnBook                 :: PubKeyHash,
-        odnBuyerTokenName       :: TokenName,
-        odnBuyerCurrencySymbol  :: CurrencySymbol,
-        odnBuyerTokenAmount     :: Integer,
-        odnSellerTokenName      :: TokenName,
-        odnSellerCurrencySymbol :: CurrencySymbol,
-        odnSellerTokenAmount    :: Integer
-    }
-PlutusTx.unstableMakeIsData ''OrderDatumNew
-
 data OrderDatum = OrderDatum
     {
-        odOwner      :: PubKeyHash,
-        odBook       :: PubKeyHash,
-        odBuyValue :: Value,
-        odSellValue  :: Value
+        odOwner                :: PubKeyHash,
+        odBook                 :: PubKeyHash,
+
+        odBuyerTokenName       :: TokenName,
+        odBuyerCurrencySymbol  :: CurrencySymbol,
+        odBuyerTokenAmount     :: Integer,
+
+        odSellerTokenName      :: TokenName,
+        odSellerCurrencySymbol :: CurrencySymbol,
+        odSellerTokenAmount    :: Integer
     }
 PlutusTx.unstableMakeIsData ''OrderDatum
 
@@ -118,8 +111,11 @@ mkValidator OrderParams {..} dat r ctx =
         feesPaidToBook :: Bool
         feesPaidToBook = Ada.fromValue (valuePaidTo info $ odBook dat) == Ada.lovelaceOf minRequiredFeeToBook
 
+        sellerValue :: Value
+        sellerValue = Value.singleton (odSellerCurrencySymbol dat) (odSellerTokenName dat) (odSellerTokenAmount dat)
+
         ownerMustGetTokensAndFees :: Bool
-        ownerMustGetTokensAndFees = valueToOwner == odSellValue dat
+        ownerMustGetTokensAndFees = valueToOwner == sellerValue
 
         -- TODO: implement this
         signerMustRedeemValue :: Bool
