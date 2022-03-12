@@ -125,7 +125,6 @@ mkValidator OrderParams {..} dat r ctx =
         -- TODO: I think it would be best to be very strict about
         -- TODO: the number of inputs and outputs allowed
 
-
 data Order
 instance Scripts.ValidatorTypes Order where
     type instance DatumType Order = OrderDatum

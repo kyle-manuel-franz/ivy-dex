@@ -40,11 +40,11 @@ writeDatum = writeJSON "dist/testnet/datum.json" $ OrderDatum {
     odOwner = Ledger.PubKeyHash "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a",
     odBook  = Ledger.PubKeyHash "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a",
 
-    odBuyerTokenName = Ada.adaToken,
-    odBuyerCurrencySymbol = Ada.adaSymbol,
+    odBuyerTokenName = "ABC",
+    odBuyerCurrencySymbol = "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a",
     odBuyerTokenAmount = 10000,
 
-    odSellerTokenName = Ada.adaToken,
-    odSellerCurrencySymbol = Ada.adaSymbol,
+    odSellerTokenName = "XYZ",
+    odSellerCurrencySymbol = "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a",
     odSellerTokenAmount = 10000
 }

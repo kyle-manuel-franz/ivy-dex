@@ -1,7 +1,7 @@
 # Ivy DEX
 Official Ivy DEX github repo started from the Plutus starter project from IOHK.
 
-# Running Tests
+## Running Tests
 
 Start the nix shell: 
 
@@ -35,7 +35,7 @@ order
 All 5 tests passed (0.53s)
 ```
 
-# Build new plutus file
+## Build new plutus file
 Load up nix shell env
 `nix-shell`
 
@@ -50,7 +50,37 @@ Run the write order validator function with an integer passed as the version num
 
 You should see a file in the `dist/testnet` folder called `order_v_<version>.plutus`
 
-# Plutus Platform starter project
+
+## Build new order datum json file
+Load up nix shell env
+
+`nix-shell`
+
+Run cabal repl
+
+`cabal repl`
+
+Open the Deploy.Order module and make edits in the hard coded Datum you want to see.
+
+Load the Deploy.Order module
+
+`:l Deploy.Order`
+
+Run the writeDatum function
+
+`writeDatum`
+
+You should see the new datum file in the `dist/testnet` folder.
+
+You can get the hash of the file using `cardano-cli`:
+
+`cardano-cli transaction hash-script-data --script-data-file dist/testnet/datum.json`
+
+
+
+
+
+## Plutus Platform starter project
 ![CI](https://github.com/input-output-hk/plutus-starter/actions/workflows/test.yml/badge.svg?branch=main)
 
 
