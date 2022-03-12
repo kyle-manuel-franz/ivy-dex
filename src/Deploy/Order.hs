@@ -38,7 +38,13 @@ writeJSON file = LBS.writeFile file . encode . scriptDataToJson ScriptDataJsonDe
 writeDatum :: IO ()
 writeDatum = writeJSON "dist/testnet/datum.json" $ OrderDatum {
     odOwner = Ledger.PubKeyHash "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a",
-    odBuyValue = Ada.lovelaceValueOf 10000,
     odBook  = Ledger.PubKeyHash "c2ff616e11299d9094ce0a7eb5b7284b705147a822f4ffbd471f971a",
-    odSellValue = Ada.lovelaceValueOf 20000
+
+    odBuyerTokenName = Ada.adaToken,
+    odBuyerCurrencySymbol = Ada.adaSymbol,
+    odBuyerTokenAmount = 10000,
+
+    odSellerTokenName = Ada.adaToken,
+    odSellerCurrencySymbol = Ada.adaSymbol,
+    odSellerTokenAmount = 10000
 }
