@@ -50,6 +50,9 @@ Run the write order validator function with an integer passed as the version num
 
 You should see a file in the `dist/testnet` folder called `order_v_<version>.plutus`
 
+### Create Script Address From Plutus File
+
+`cardano-cli address build --payment-script-file dist/testnet/order_v_1.plutus --testnet-magic $CARDANO_TESTNET_MAGIC --out-file dist/testnet/order_v_1.script`
 
 ## Build new order datum json file
 Load up nix shell env
