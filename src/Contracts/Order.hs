@@ -25,18 +25,19 @@ import           PlutusTx.Prelude
 
 data OrderDatum = OrderDatum
     {
-        odOwner                :: PubKeyHash,
-        odBook                 :: PubKeyHash,
+        odOwner                :: !PubKeyHash,
+        odBook                 :: !PubKeyHash,
 
-        odBuyerTokenName       :: TokenName,
-        odBuyerCurrencySymbol  :: CurrencySymbol,
-        odBuyerTokenAmount     :: Integer,
+        odBuyerTokenName       :: !TokenName,
+        odBuyerCurrencySymbol  :: !CurrencySymbol,
+        odBuyerTokenAmount     :: !Integer,
 
-        odSellerTokenName      :: TokenName,
-        odSellerCurrencySymbol :: CurrencySymbol,
-        odSellerTokenAmount    :: Integer
+        odSellerTokenName      :: !TokenName,
+        odSellerCurrencySymbol :: !CurrencySymbol,
+        odSellerTokenAmount    :: !Integer
     }
 PlutusTx.unstableMakeIsData ''OrderDatum
+PlutusTx.makeLift ''OrderDatum
 
 data OrderRedeemer = Take | Cancel
 PlutusTx.unstableMakeIsData ''OrderRedeemer
